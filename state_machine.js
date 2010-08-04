@@ -1,6 +1,6 @@
 steal.plugins('jquery/controller/subscribe', 
               'jquery/controller',
-              'steal/openajax')
+              'jquery/lang/openajax')
      .then(function($) {
 
   $.Controller.extend("SS.Controller.StateMachine",
