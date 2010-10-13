@@ -4,7 +4,7 @@ title: "SecondStoryJS: State Machine"
 ---
 
 <h2>SecondStoryJS: State Machine (v1.0.0)</h2>
-<p>SecondStoryJS is our front-end development framework built as a collection of plugins for JavascriptMVC3. This plugin, the State Machine, is an extension of the <tt>jQuery.Controller</tt> which acts as a <a href="http://en.wikipedia.org/wiki/Finite-state_machine">Finite State Machine</a>. Each instance of a <tt>SS.Controller.StateMachine</tt> stores its current state, provides a means of changing states based on input and executing code on state change. State Machine's are pretty technical, but once you start using them to represent widgets, you'll never go back.</p>
+<p>SecondStoryJS is our front-end development framework built as a collection of plugins for JavascriptMVC3. This plugin, the State Machine, is an extension of the <tt>jQuery.Controller</tt> which acts as a <a href="http://en.wikipedia.org/wiki/Finite-state_machine">Finite State Machine</a>. Each instance of a <tt>SS.Controller.StateMachine</tt> stores its current state, provides a means of changing states based on input and executing code on state change. State Machines are pretty technical, but once you start using them to represent widgets, you'll never go back.</p>
 
 <h3>Features</h3>
 <ul>
@@ -26,7 +26,7 @@ title: "SecondStoryJS: State Machine"
 {% endhighlight %}
 
 <h4>State Definitions</h4>
-<p>The <tt>initial</tt> state is exactly like any other state, to define another state, simply create another object in your <tt>states</tt> map.</p>
+<p>The <tt>initial</tt> state is exactly like any other state. To define another state, simply create another object in your <tt>states</tt> map.</p>
 {% highlight javascript %}
   states: {
     initial:  { },
@@ -150,7 +150,7 @@ SS.Controller.StateMachine.extend("EnableOrDisableWidget", {
 {
 });
 {% endhighlight %}
-<p>The above will set an <tt>iAmEnabled</tt> class on the element when it is in the <tt>initial</tt> state and change that class to <tt>iAmDisabled</tt> when it is in the <tt>disabled</tt> state.</p>
+<p>The above will set an <tt>iAmEnabled</tt> class on the element when it is in the <tt>initial</tt> state and change that class to <tt>iAmDisabled</tt> when it is in the <tt>disabled</tt> state. The first parameter is the "default" parameter and the element will have that class unless it is in a state described by the second parameter. If there were a third state, called "indeterminate" then the element would have the "iAmEnabled" class because no overwrite for that state is described in the second parameter.</p>
 
 <h3>Installation</h3>
 <p>The source code is available on GitHub at <a href="http://github.com/secondstory/secondstoryjs-statemachine">http://github.com/secondstory/secondstoryjs-statemachine</a>. Please, fork the project, make your own changes and we'll happily pull bug fixes and new features into the official repository.</p>
