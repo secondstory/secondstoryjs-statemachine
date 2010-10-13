@@ -1,1 +1,165 @@
-State Machine
+---
+layout: default
+title: "SecondStoryJS: State Machine"
+---
+
+<h2>SecondStoryJS: State Machine (v1.0.0)</h2>
+<p>SecondStoryJS is our front-end development framework built as a collection of plugins for JavascriptMVC3. This plugin, the State Machine, is an extension of the <tt>jQuery.Controller</tt> which acts as a <a href="http://en.wikipedia.org/wiki/Finite-state_machine">Finite State Machine</a>. Each instance of a <tt>SS.Controller.StateMachine</tt> stores its current state, provides a means of changing states based on input and executing code on state change. State Machine's are pretty technical, but once you start using them to represent widgets, you'll never go back.</p>
+
+<h3>Features</h3>
+<ul>
+  <li>Controllers can exist in a specific state</li>
+  <li>They can take state-specific actions on generic events</li>
+  <li>They can manually transition to chosen states</li>
+  <li>They can execute code on state changes</li>
+</ul>
+
+<h3>The State Map Object</h3>
+<p>All states, their events, transitions and callback functions are described in the <tt>states</tt> object. The format and its features are as follows</p>
+
+<h4>Initial State</h4>
+<p>All instances of a state machine will start in the <tt>initial</tt> state. This must be present in your <tt>states</tt> object.</p>
+{% highlight javascript %}
+  states: {
+    initial: { }
+  }
+{% endhighlight %}
+
+<h4>State Definitions</h4>
+<p>The <tt>initial</tt> state is exactly like any other state, to define another state, simply create another object in your <tt>states</tt> map.</p>
+{% highlight javascript %}
+  states: {
+    initial:  { },
+    stateTwo: { }
+  }
+{% endhighlight %}
+
+<h4>Definition a Transition</h4>
+<p>States can only move to another state if they explicitly declare that transition possible. They must also declare which "event" triggers the transition. In the following definition, the state machine will move from <tt>initial</tt> to <tt>stateTwo</tt> when it recieves a <tt>pleaseMoveToStateTwo</tt> event.</p>
+{% highlight javascript %}
+  states: {
+    initial:  { "pleaseMoveToStateTwo": "stateTwo" },
+    stateTwo: { }
+  }
+{% endhighlight %}
+<p>In the above example, someone must manually call <tt>instance.publishState("pleaseMoveToStateTwo")</tt> to trigger the transition</p>
+
+<h4>Alternative Events</h4>
+<p>The state machine can also trigger transitions on jQuery DOM events and JavascriptMVC Controller (read: OpenAjax) events.</p>
+<p>So, let's say that clicking an HTML element called <tt>move</tt> can also run the transition</p>
+{% highlight javascript %}
+  states: {
+    initial:  { "pleaseMoveToStateTwo": "stateTwo",
+                "#move click":          "stateTwo" },
+    stateTwo: { }
+  }
+{% endhighlight %}
+<p>Finally, there is also a generic <tt>app.everyBodyMove</tt> OpenAjax event that could trigger the transition.</p>
+{% highlight javascript %}
+  states: {
+    initial:  { "pleaseMoveToStateTwo":        "stateTwo",
+                "#move click":                 "stateTwo",
+                "app.everyBodyMove subscribe": "stateTwo" },
+    stateTwo: { }
+  }
+{% endhighlight %}
+
+<h4>State-specific events</h4>
+<p>All of the above examples will only trigger a transition when the state machine is in the <tt>initial</tt> state. Once it has been moved to the <tt>stateTwo</tt> state, it will stay there because we have not defined any transitions to either another state or back to the <tt>initial</tt> state.</p>
+<p>So, let's define a transition to move us back to the <tt>initial</tt> state when we click an HTML element called <tt>back</tt>.
+{% highlight javascript %}
+  states: {
+    initial:  { "pleaseMoveToStateTwo":        "stateTwo",
+                "#move click":                 "stateTwo",
+                "app.everyBodyMove subscribe": "stateTwo" },
+    stateTwo: { "#back click":                 "initial" }
+  }
+{% endhighlight %}
+
+<h4>Global Events</h4>
+<p>Finally, we may need some transitions that execute no matter which state we are in. Perhaps something like a reset or an event to pause the state machine. We can define these in the special <tt>global</tt> state.</p>
+<p>Let's assume we have an HTML element called <tt>reset</tt> which will return us to the <tt>initial</tt> state no matter where we are.</p>
+{% highlight javascript %}
+  states: {
+    global:   { "#reset click":                "initial" },
+    initial:  { "pleaseMoveToStateTwo":        "stateTwo",
+                "#move click":                 "stateTwo",
+                "app.everyBodyMove subscribe": "stateTwo" },
+    stateTwo: { "#back click":                 "initial" }
+  }
+{% endhighlight %}
+
+<h4>Entry and Exit Callbacks</h4>
+<p>Finally, we will want to actually DO something when states are changed. Each state definition has an <tt>onEnter</tt> and an <tt>onExit</tt> value which can be used in two different ways.</p>
+<p>The first way is similar to JavascriptMVC's <tt>this.callback</tt> which executes a function in the current scope. So, let's say we want to show an alert box when we move to <tt>stateTwo</tt>. We'll start showing the whole controller definition now.</p>
+{% highlight javascript %}
+SS.Controller.StateMachine.extend("Example", {
+  states: {
+    global:   { "#reset click":                "initial" },
+    initial:  { "pleaseMoveToStateTwo":        "stateTwo",
+                "#move click":                 "stateTwo",
+                "app.everyBodyMove subscribe": "stateTwo" },
+    stateTwo: { onEnter:                       "showAlert",
+                "#back click":                 "initial" }
+  }
+},
+{
+  showAlert: function() {
+    alert("we are in stateTwo");
+  }
+});
+{% endhighlight %}
+<p>The <tt>showAlert</tt> function will be excuted when we enter <tt>stateTwo</tt> which can happen my direct event (<tt>pleaseMoveToStateTwo</tt>), HTML click event (on <tt>#move</tt>) or OpenAjax event (<tt>app.everyBodyMove</tt>).</p>
+<p>It is also possible to publish OpenAjax events instead of calling a local function <tt>onEnter</tt> or <tt>onExit</tt>. So let's send a <tt>app.leftStateTwo</tt> event when we leave <tt>stateTwo</tt>.</p>
+{% highlight javascript %}
+SS.Controller.StateMachine.extend("Example", {
+  states: {
+    global:   { "#reset click":                "initial" },
+    initial:  { "pleaseMoveToStateTwo":        "stateTwo",
+                "#move click":                 "stateTwo",
+                "app.everyBodyMove subscribe": "stateTwo" },
+    stateTwo: { onEnter:                       "showAlert",
+                "#back click":                 "initial",
+                onExit:                        "app.leftStateTwo" }
+  }
+},
+{
+  showAlert: function() {
+    alert("we are in stateTwo");
+  }
+});
+{% endhighlight %}
+<p>Now the <tt>app.leftStateTwo</tt> event will be published when we leave <tt>stateTwo</tt> which can happen by either clicking the <tt>#reset</tt> HTML element or the <tt>#back</tt> element.</p>
+
+<h3>Automatically Setting CSS Classes</h3>
+<p>Let's say we have a controller which can be enabled and disabled and we want the disabled state to have a red background. We can automatically update the element's class when states change with <tt>mapStatesToClass</tt> function. Here's a full example:</p>
+{% highlight javascript %}
+SS.Controller.StateMachine.extend("EnableOrDisableWidget", {
+  states: {
+    initial:  { "disableMe": "disabled" },
+    disabled: { }
+  },
+  
+  setup: function() {
+    this._super.apply(this, arguments);
+    this.mapStatesToClass("iAmEnabled", {
+      disabled: "iAmDisabled"
+    });
+  }
+},
+{
+});
+{% endhighlight %}
+<p>The above will set an <tt>iAmEnabled</tt> class on the element when it is in the <tt>initial</tt> state and change that class to <tt>iAmDisabled</tt> when it is in the <tt>disabled</tt> state.</p>
+
+<h3>Installation</h3>
+<p>The source code is available on GitHub at <a href="http://github.com/secondstory/secondstoryjs-statemachine">http://github.com/secondstory/secondstoryjs-statemachine</a>. Please, fork the project, make your own changes and we'll happily pull bug fixes and new features into the official repository.</p>
+<p>However, JavascriptMVC3 provides an easier way to download plugins. From your project folder, simply run:</p>
+<pre>./steal/js steal/getjs ss/state_machine</pre>
+<p>This will download the full plugin into your working directory.</p>
+
+<h3>License</h3>
+<p>This code is provided under the <a href="http://github.com/secondstory/secondstoryjs-statemachine/blob/master/LICENSE">MIT License</a>.</p>
+
+<h3>Bugs</h3>
+<p>Please submit any bug reports to the project issue tracker on GitHub at: <a href="http://github.com/secondstory/secondstoryjs-statemachine/issues">http://github.com/secondstory/secondstoryjs-statemachine/issues</a>.</p>
