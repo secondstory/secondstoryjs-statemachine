@@ -216,4 +216,4 @@ steal.plugins('jquery/controller/subscribe',
     }
   }
   );
-})
+}).then("map_states_to_class/map_states_to_class")
