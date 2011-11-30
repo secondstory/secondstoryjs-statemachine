@@ -1,7 +1,4 @@
-steal.plugins("ss/controller/state_machine")
-     .then(function($) {
-
-  $.Controller.extend('SS.Controller.MapStatesToClass',
+  $.Controller('SS.Controller.MapStatesToClass',
   {
     onDocument: true,
     mappings:   {}
@@ -56,4 +53,3 @@ steal.plugins("ss/controller/state_machine")
       callback:       callback || $.noop
     };
   };
-});
