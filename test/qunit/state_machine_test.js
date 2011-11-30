@@ -1,6 +1,6 @@
 module("State Machine Controller");
 
-SS.Controller.StateMachine.extend("TestController", {
+SS.Controller.StateMachine("TestController", {
   states: {
     global:     { globalEvent:             "stateSix" },
   
