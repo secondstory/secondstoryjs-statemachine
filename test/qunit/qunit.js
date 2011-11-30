@@ -1,4 +1,4 @@
-steal
-  .plugins("ss/controller/state_machine") //load your app
-  .plugins("funcunit/qunit")   //load qunit
-  .then("state_machine_test")
+steal(
+    'ss/statemachine/state_machine.js'
+,   'funcunit/qunit'
+).then("ss/statemachine/test/qunit/state_machine_test.js")

@@ -1,9 +1,9 @@
-steal.plugins('jquery/controller/subscribe', 
-              'jquery/controller',
-              'jquery/lang/openajax')
+steal('jquery/controller/subscribe', 
+    'jquery/controller',
+    'jquery/lang/openajax')
      .then(function($) {
 
-  $.Controller.extend("SS.Controller.StateMachine",
+  $.Controller("SS.Controller.StateMachine",
   {
     stateSuffixCounter: 0,
     states: {
@@ -216,4 +216,5 @@ steal.plugins('jquery/controller/subscribe',
     }
   }
   );
-}).then("map_states_to_class/map_states_to_class")
+})
+//.then("./map_states_to_class/map_states_to_class")
